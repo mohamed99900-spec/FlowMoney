@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090d14">
+<title>FlowMoney | مدير أموالك الشخصي</title>
+
+<style>
+:root {
+  --bg:#090d14;
+  --panel:#111a27;
+  --panel2:#0d1420;
+  --line:#273449;
+  --text:#f1f5fc;
+  --muted:#91a0b5;
+  --green:#54e0a0;
+  --cyan:#65d9ec;
+  --red:#fb7185;
+  --yellow:#fbbf24;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:radial-gradient(ellipse at 10% 0%,#17634a20,transparent 35%),var(--bg);
+  color:var(--text);
+  font-family:system-ui,"Segoe UI",Tahoma,Arial,sans-serif;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.app{max-width:1400px;margin:auto;padding:22px}
+header{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid #ffffff12}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--green),var(--cyan));display:grid;place-items:center;color:#071710;font-size:25px;font-weight:1000}
+h1{font-size:21px;margin:0}
+.brand p{font-size:11px;color:var(--muted);margin:4px 0 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:10px 13px;border-radius:11px;border:1px solid var(--line);background:#172131;color:var(--text);font-size:12px;font-weight:750}
+.btn:hover{border-color:var(--green)}
+.btn.primary{background:linear-gradient(100deg,var(--green),var(--cyan));border:0;color:#071710}
+.btn.danger{color:#ff9ca9}
+.hero{padding:30px 0}
+.eyebrow{font-size:10px;font-weight:900;color:var(--green);letter-spacing:1px}
+.hero h2{font-size:clamp(27px,4vw,43px);line-height:1.4;margin:12px 0}
+.gradient{background:linear-gradient(90deg,var(--green),var(--cyan));color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:12px;line-height:2;max-width:700px}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.toolbar label,.muted{font-size:11px;color:var(--muted)}
+input,select,textarea{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px;color:var(--text);min-width:0}
+select option{background:var(--panel)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.card,.panel{background:linear-gradient(145deg,#141e2c,#101722);border:1px solid var(--line);border-radius:18px;padding:18px;min-width:0}
+.metric-label{font-size:11px;color:var(--muted)}
+.metric-value{font-size:clamp(19px,2.4vw,28px);font-weight:950;margin:14px 0 5px;overflow-wrap:anywhere}
+.metric-foot{font-size:10px;color:var(--muted);line-height:1.8}
+.positive{color:var(--green)}.negative{color:var(--red)}
+.two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:15px;margin-top:15px}
+.panel h3{font-size:14px;margin:0 0 16px}
+.list{display:grid;gap:9px}
+.tx{display:flex;align-items:center;gap:10px;background:#0b111b;border:1px solid #222e42;border-radius:12px;padding:12px}
+.tx-icon{width:38px;height:38px;display:grid;place-items:center;background:#ffffff09;border-radius:11px;font-size:19px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-info strong{font-size:12px;display:block;overflow-wrap:anywhere}
+.tx-info small{display:block;color:var(--muted);font-size:10px;margin-top:5px}
+.tx-amount{font-size:12px;font-weight:900;white-space:nowrap}
+.delete{border:0;background:transparent;color:var(--red);font-size:20px;padding:4px}
+.empty{padding:25px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;font-size:12px;line-height:2}
+.bar{height:7px;background:#263247;border-radius:9px;overflow:hidden;margin:12px 0}
+.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:9px}
+#flowChart{width:100%;height:220px;display:block}
+.modal-backdrop{display:none;position:fixed;inset:0;background:#03050bdf;z-index:10;padding:16px;align-items:center;justify-content:center;overflow:auto}
+.modal-backdrop.show{display:flex}
+.modal{width:min(520px,100%);max-height:95vh;overflow:auto;background:#121a28;border:1px solid #344157;border-radius:20px;padding:22px}
+.modal h3{margin:0 0 20px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:800;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-actions{display:flex;gap:9px;margin-top:18px}
+.modal-actions button{flex:1}
+.notice{display:none;padding:12px;border-radius:10px;background:#54e0a014;color:var(--green);font-size:12px;margin-bottom:14px;line-height:1.8}
+.notice.show{display:block}
+footer{text-align:center;color:#748197;font-size:10px;padding:25px 0}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two-col{grid-template-columns:1fr}}
+@media(max-width:500px){.app{padding:13px}.grid{gap:8px}.card,.panel{padding:13px}.metric-value{font-size:19px}.form-grid{grid-template-columns:1fr}.actions .btn{padding:8px;font-size:10px}}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="brand">
+    <div class="logo">F</div>
+    <div>
+      <h1>Flow<span style="color:var(--green)">Money</span></h1>
+      <p>PERSONAL FINANCE OS · مدير أموالك الشخصي</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" id="addBtn">＋ معاملة جديدة</button>
+    <button class="btn" id="exportBtn">⇩ تصدير CSV</button>
+    <button class="btn danger" id="clearBtn">مسح البيانات</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">✦ KNOW YOUR MONEY. OWN YOUR FUTURE.</div>
+  <h2>فلوسك تحت السيطرة.<br><span class="gradient">مستقبلك يبدأ من هنا.</span></h2>
+  <p>سجّل دخلك الحقيقي ومصروفاتك، وتابع رصيدك وقراراتك المالية. يبدأ الموقع بدون معاملات تجريبية، ويحفظ بياناتك على هذا المتصفح.</p>
+</section>
+
+<div class="notice" id="notice" role="status"></div>
+
+<div class="toolbar">
+  <label for="monthFilter">الفترة:</label>
+  <select id="monthFilter">
+    <option value="all">كل الفترات</option>
+  </select>
+
+  <label for="currency">العملة:</label>
+  <select id="currency">
+    <option value="EGP">جنيه مصري EGP</option>
+    <option value="USD">دولار USD</option>
+    <option value="SAR">ريال سعودي SAR</option>
+    <option value="EUR">يورو EUR</option>
+    <option value="AED">درهم إماراتي AED</option>
+  </select>
+  <span class="muted" id="countLabel"></span>
+</div>
+
+<section class="grid">
+  <article class="card">
+    <div class="metric-label">الرصيد المسجل</div>
+    <div class="metric-value" id="balance">0</div>
+    <div class="metric-foot">الدخل ناقص المصروفات</div>
+  </article>
+  <article class="card">
+    <div class="metric-label">إجمالي الدخل</div>
+    <div class="metric-value positive" id="income">0</div>
+    <div class="metric-foot">للفترة المختارة</div>
+  </article>
+  <article class="card">
+    <div class="metric-label">إجمالي المصروفات</div>
+    <div class="metric-value negative" id="expenses">0</div>
+    <div class="metric-foot">للفترة المختارة</div>
+  </article>
+  <article class="card">
+    <div class="metric-label">معدل الادخار</div>
+    <div class="metric-value" id="savingRate">—</div>
+    <div class="metric-foot" id="savingCaption">سجّل دخلك لحساب النسبة</div>
+  </article>
+</section>
+
+<div class="two-col">
+  <section class="panel">
+    <h3>◈ التدفق المالي الشهري</h3>
+    <canvas id="flowChart" aria-label="رسم بياني للدخل والمصروفات"></canvas>
+    <div class="muted">الأخضر: الدخل — الأحمر: المصروفات</div>
+  </section>
+
+  <section class="panel">
+    <h3>◉ مصروفاتك حسب الفئة</h3>
+    <div id="categories" class="list"></div>
+  </section>
+</div>
+
+<div class="two-col">
+  <section class="panel">
+    <h3>⇄ سجل المعاملات</h3>
+    <div class="toolbar">
+      <input id="search" placeholder="ابحث عن معاملة..." style="flex:1;width:100%">
+      <select id="typeFilter">
+        <option value="all">كل الأنواع</option>
+        <option value="income">الدخل فقط</option>
+        <option value="expense">المصروفات فقط</option>
+      </select>
+    </div>
+    <div id="transactions" class="list"></div>
+  </section>
+
+  <section class="panel">
+    <h3>✦ تذكير مالي</h3>
+    <p class="muted" style="line-height:2.2">
+      • سجّل دخلك عندما تستلمه.<br>
+      • سجّل مصروفاتك حتى تعرف أين تذهب أموالك.<br>
+      • لا تسجّل المال نفسه مرتين.<br>
+      • الرصيد هنا محسوب من المعاملات التي تدخلها، وليس رصيدًا متصلًا بالبنك.
+    </p>
+    <div class="bar"><span id="savingBar" style="width:0%"></span></div>
+    <div id="summaryText" class="muted">ابدأ بإضافة أول معاملة حقيقية.</div>
+  </section>
+</div>
+
+<footer>FlowMoney · فكرة 100 — المشروع 07<br>بياناتك محفوظة في متصفحك فقط. لا يوجد اتصال بحسابك البنكي.</footer>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <h3 id="modalTitle">إضافة معاملة حقيقية</h3>
+
+    <form id="transactionForm">
+      <div class="field">
+        <label for="txType">نوع المعاملة</label>
+        <select id="txType" required>
+          <option value="income">دخل</option>
+          <option value="expense">مصروف</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="txTitle">اسم المعاملة أو مصدر الدخل</label>
+        <input id="txTitle" maxlength="100" required placeholder="مثال: راتب شهر أكتوبر">
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="txAmount">المبلغ</label>
+          <input id="txAmount" type="number" min="0.01" max="1000000000000" step="0.01" required placeholder="اكتب المبلغ">
+        </div>
+        <div class="field">
+          <label for="txCategory">الفئة</label>
+          <select id="txCategory" required></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="txDate">التاريخ</label>
+        <input id="txDate" type="date" required>
+      </div>
+
+      <div class="field">
+        <label for="txNote">ملاحظات (اختياري)</label>
+        <input id="txNote" maxlength="200" placeholder="أي تفاصيل إضافية">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn primary" type="submit">حفظ المعاملة</button>
+        <button class="btn" type="button" id="cancelBtn">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $ = id => document.getElementById(id);
+const STORAGE = "flowmoney-v2";
+const OLD_STORAGE = "flowmoney-v1";
+
+const categories = [
+  {id:"salary",name:"الراتب",icon:"💼",type:"income"},
+  {id:"business",name:"العمل الحر",icon:"💻",type:"income"},
+  {id:"investment",name:"استثمارات",icon:"📈",type:"income"},
+  {id:"otherIncome",name:"دخل آخر",icon:"💵",type:"income"},
+  {id:"food",name:"الطعام",icon:"🍽️",type:"expense"},
+  {id:"transport",name:"المواصلات",icon:"🚗",type:"expense"},
+  {id:"housing",name:"السكن والفواتير",icon:"🏠",type:"expense"},
+  {id:"shopping",name:"التسوق",icon:"🛍️",type:"expense"},
+  {id:"health",name:"الصحة",icon:"💊",type:"expense"},
+  {id:"education",name:"التعليم",icon:"📚",type:"expense"},
+  {id:"entertainment",name:"الترفيه",icon:"🎮",type:"expense"},
+  {id:"subscriptions",name:"الاشتراكات",icon:"🔁",type:"expense"},
+  {id:"otherExpense",name:"مصروف آخر",icon:"📦",type:"expense"}
+];
+
+const palette = ["#54e0a0","#65d9ec","#a78bfa","#fbbf24","#fb7185","#60a5fa","#f472b6"];
+let state = {transactions:[],currency:"EGP"};
+
+function today(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function safeId(){
+  return (crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : String(Date.now()) + Math.random().toString(16).slice(2);
+}
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function getCategory(id){
+  return categories.find(c => c.id === id) || {
+    id:"otherExpense",name:"مصروف آخر",icon:"📦",type:"expense"
+  };
+}
+
+function load(){
+  try{
+    // استخدم بيانات النسخة الجديدة فقط؛ لا نستورد الأرقام التجريبية القديمة تلقائيًا.
+    const raw = JSON.parse(localStorage.getItem(STORAGE) || "null");
+    if(!raw || !Array.isArray(raw.transactions)) return;
+
+    state.transactions = raw.transactions.filter(t =>
+      t &&
+      typeof t.id === "string" &&
+      typeof t.title === "string" &&
+      typeof t.amount === "number" &&
+      Number.isFinite(t.amount) &&
+      t.amount > 0 &&
+      ["income","expense"].includes(t.type) &&
+      typeof t.date === "string"
+    );
+
+    state.currency = ["EGP","USD","SAR","EUR","AED"].includes(raw.currency)
+      ? raw.currency : "EGP";
+  }catch(error){
+    state = {transactions:[],currency:"EGP"};
+  }
+}
+
+function save(){
+  try{
+    localStorage.setItem(STORAGE, JSON.stringify(state));
+    return true;
+  }catch(error){
+    alert("تعذر حفظ البيانات في المتصفح. صدّر نسخة احتياطية أو أفرغ مساحة.");
+    return false;
+  }
+}
+
+function money(value){
+  return new Intl.NumberFormat("ar-EG",{
+    style:"currency",
+    currency:state.currency,
+    maximumFractionDigits:2
+  }).format(value || 0);
+}
+
+function monthValue(){
+  return $("monthFilter").value;
+}
+
+function getFiltered(){
+  const month = monthValue();
+  return state.transactions.filter(t =>
+    month === "all" || t.date.startsWith(month)
+  );
+}
+
+function monthName(value){
+  const [y,m] = value.split("-").map(Number);
+  return new Date(y,m-1,1).toLocaleDateString("ar-EG",{
+    year:"numeric",month:"long"
+  });
+}
+
+function updateMonthOptions(){
+  const select = $("monthFilter");
+  const old = select.value || "all";
+  const months = [...new Set(state.transactions.map(t=>t.date.slice(0,7)))].sort().reverse();
+
+  select.innerHTML = '<option value="all">كل الفترات</option>' +
+    months.map(m=>`<option value="${m}">${escapeHTML(monthName(m))}</option>`).join("");
+
+  select.value = months.includes(old) ? old : "all";
+}
+
+function renderMetrics(){
+  const tx = getFiltered();
+  const income = tx.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
+  const expenses = tx.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+  const balance = income-expenses;
+  const rate = income > 0 ? balance/income*100 : 0;
+
+  $("balance").textContent = money(balance);
+  $("income").textContent = money(income);
+  $("expenses").textContent = money(expenses);
+  $("savingRate").textContent = income > 0 ? Math.round(rate)+"%" : "—";
+  $("savingCaption").textContent = income > 0
+    ? (rate < 0 ? "مصروفاتك أعلى من دخلك" : "نسبة المتبقي من الدخل")
+    : "سجّل دخلًا لحساب النسبة";
+
+  $("balance").className = "metric-value " + (balance >= 0 ? "positive" : "negative");
+  $("countLabel").textContent = `عدد المعاملات: ${tx.length}`;
+  $("savingBar").style.width = Math.max(0,Math.min(100,rate))+"%";
+  $("summaryText").textContent = tx.length
+    ? `المتبقي للفترة المختارة: ${money(balance)}. الأرقام ناتجة عن معاملاتك المسجلة.`
+    : "لا توجد معاملات في الفترة المختارة. أضف دخلك أو مصروفاتك الحقيقية.";
+}
+
+function renderCategories(){
+  const tx = getFiltered().filter(t=>t.type==="expense");
+  const totals = {};
+
+  tx.forEach(t=>totals[t.category]=(totals[t.category]||0)+t.amount);
+  const data = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  const total = data.reduce((s,item)=>s+item[1],0);
+
+  if(!data.length){
+    $("categories").innerHTML = '<div class="empty">لا توجد مصروفات مسجلة بعد.</div>';
+    return;
+  }
+
+  $("categories").innerHTML = data.map(([id,amount],i)=>{
+    const cat = getCategory(id);
+    const pct = total ? amount/total*100 : 0;
+    return `<div>
+      <div style="display:flex;justify-content:space-between;gap:8px">
+        <span style="font-size:12px">${cat.icon} ${escapeHTML(cat.name)}</span>
+        <strong style="font-size:12px">${money(amount)}</strong>
+      </div>
+      <div class="bar"><span style="width:${pct}%;background:${palette[i%palette.length]}"></span></div>
+      <div class="muted">${Math.round(pct)}% من المصروفات</div>
+    </div>`;
+  }).join("");
+}
+
+function renderTransactions(){
+  const query = $("search").value.trim().toLowerCase();
+  const type = $("typeFilter").value;
+
+  const tx = getFiltered()
+    .filter(t=>(type==="all" || t.type===type))
+    .filter(t=>(`${t.title} ${t.note||""} ${getCategory(t.category).name}`).toLowerCase().includes(query))
+    .sort((a,b)=>b.date.localeCompare(a.date));
+
+  if(!tx.length){
+    $("transactions").innerHTML = '<div class="empty">لا توجد معاملات هنا.<br>اضغط «معاملة جديدة» لتسجيل أول عملية.</div>';
+    return;
+  }
+
+  $("transactions").innerHTML = tx.map(t=>{
+    const cat = getCategory(t.category);
+    const isIncome = t.type === "income";
+    return `<div class="tx">
+      <div class="tx-icon">${cat.icon}</div>
+      <div class="tx-info">
+        <strong>${escapeHTML(t.title)}</strong>
+        <small>${escapeHTML(cat.name)} · ${escapeHTML(t.date)}${t.note?" · "+escapeHTML(t.note):""}</small>
+      </div>
+      <div class="tx-amount ${isIncome?"positive":"negative"}">${isIncome?"+":"−"}${money(t.amount)}</div>
+      <button class="delete" data-delete="${escapeHTML(t.id)}" aria-label="حذف المعاملة">×</button>
+    </div>`;
+  }).join("");
+
+  $("transactions").querySelectorAll("[data-delete]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const t = state.transactions.find(x=>x.id===btn.dataset.delete);
+      if(!t) return;
+      if(!confirm(`هل تريد حذف المعاملة «${t.title}»؟`)) return;
+      state.transactions = state.transactions.filter(x=>x.id!==t.id);
+      save();
+      renderAll();
+    });
+  });
+}
+
+function drawChart(){
+  const canvas = $("flowChart");
+  const rect = canvas.getBoundingClientRect();
+  if(!rect.width) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width*dpr);
+  canvas.height = 220*dpr;
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  const w = rect.width, h = 220;
+  ctx.clearRect(0,0,w,h);
+
+  const map = {};
+  getFiltered().forEach(t=>{
+    const month = t.date.slice(0,7);
+    if(!map[month]) map[month] = {income:0,expense:0};
+    map[month][t.type] += t.amount;
+  });
+
+  const months = Object.keys(map).sort().slice(-6);
+
+  if(!months.length){
+    ctx.fillStyle = "#91a0b5";
+    ctx.font = "12px system-ui";
+    ctx.textAlign = "center";
+    ctx.fillText("سجّل معاملاتك لعرض الرسم البياني",w/2,110);
+    return;
+  }
+
+  const max = Math.max(1,...months.flatMap(m=>[map[m].income,map[m].expense]));
+  const top = 12, bottom = 38, chartH = h-top-bottom;
+  const slot = w/months.length;
+
+  ctx.strokeStyle = "#273449";
+  for(let i=0;i<4;i++){
+    const y = top+chartH*i/3;
+    ctx.beginPath();ctx.moveTo(5,y);ctx.lineTo(w-5,y);ctx.stroke();
+  }
+
+  months.forEach((m,i)=>{
+    const center = slot*(i+.5);
+    const bw = Math.min(22,slot*.25);
+    const ih = map[m].income/max*chartH;
+    const eh = map[m].expense/max*chartH;
+
+    ctx.fillStyle = "#54e0a0";
+    if(ih>0) ctx.fillRect(center-bw-2,top+chartH-ih,bw,ih);
+
+    ctx.fillStyle = "#fb7185";
+    if(eh>0) ctx.fillRect(center+2,top+chartH-eh,bw,eh);
+
+    ctx.fillStyle = "#91a0b5";
+    ctx.font = "10px system-ui";
+    ctx.textAlign = "center";
+    ctx.fillText(m.slice(5),center,h-12);
+  });
+}
+
+function renderAll(){
+  updateMonthOptions();
+  renderMetrics();
+  renderCategories();
+  renderTransactions();
+  drawChart();
+  $("currency").value = state.currency;
+}
+
+function populateCategories(type){
+  const valid = categories.filter(c=>c.type===type);
+  $("txCategory").innerHTML = valid.map(c=>
+    `<option value="${c.id}">${c.icon} ${escapeHTML(c.name)}</option>`
+  ).join("");
+}
+
+function openModal(){
+  $("transactionForm").reset();
+  $("txType").value = "income";
+  populateCategories("income");
+  $("txDate").value = today();
+  $("modalBackdrop").classList.add("show");
+  setTimeout(()=>$("txTitle").focus(),50);
+}
+
+function closeModal(){
+  $("modalBackdrop").classList.remove("show");
+}
+
+function addTransaction(event){
+  event.preventDefault();
+
+  const type = $("txType").value;
+  const title = $("txTitle").value.trim();
+  const amount = Number($("txAmount").value);
+  const date = $("txDate").value;
+  const catId = $("txCategory").value;
+  const cat = getCategory(catId);
+
+  if(!title){
+    alert("اكتب اسم المعاملة أو مصدر الدخل.");
+    return;
+  }
+
+  if(!Number.isFinite(amount) || amount<=0 || amount>1e12){
+    alert("اكتب مبلغًا صحيحًا أكبر من صفر.");
+    return;
+  }
+
+  if(!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)){
+    alert("اختر تاريخًا صحيحًا.");
+    return;
+  }
+
+  // تأكد من أن الفئة تتوافق مع نوع المعاملة.
+  if(cat.type !== type){
+    alert("الفئة لا تتوافق مع نوع المعاملة. اختر الفئة الصحيحة.");
+    populateCategories(type);
+    return;
+  }
+
+  state.transactions.push({
+    id:safeId(),
+    type,
+    title,
+    amount,
+    date,
+    category:catId,
+    note:$("txNote").value.trim().slice(0,200)
+  });
+
+  if(!save()) return;
+
+  closeModal();
+  renderAll();
+  showNotice("تم حفظ المعاملة بنجاح.");
+}
+
+function showNotice(message){
+  const el = $("notice");
+  el.textContent = message;
+  el.classList.add("show");
+  // تختفي الرسالة عند التفاعل التالي، دون الحاجة إلى مؤقت.
+}
+
+function clearAll(){
+  if(!confirm("تحذير: سيتم حذف جميع معاملات FlowMoney المحفوظة في هذا المتصفح. هل أنت متأكد؟")) return;
+  if(!confirm("تأكيد أخير: هل تريد فعلًا البدء من الصفر؟ تأكد من تصدير نسخة احتياطية إن احتجت بياناتك.")) return;
+
+  state = {transactions:[],currency:state.currency};
+  localStorage.removeItem(OLD_STORAGE);
+  save();
+  renderAll();
+  showNotice("تم مسح المعاملات. يمكنك الآن تسجيل دخلك الحقيقي.");
+}
+
+function exportCSV(){
+  const rows = [["النوع","الاسم","المبلغ","العملة","الفئة","التاريخ","ملاحظات"]];
+
+  state.transactions.forEach(t=>{
+    rows.push([
+      t.type==="income"?"دخل":"مصروف",
+      t.title,
+      t.amount,
+      state.currency,
+      getCategory(t.category).name,
+      t.date,
+      t.note||""
+    ]);
+  });
+
+  const csv = "\uFEFF" + rows.map(row=>
+    row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")
+  ).join("\r\n");
+
+  const blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "flowmoney-transactions.csv";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+$("addBtn").addEventListener("click",openModal);
+$("cancelBtn").addEventListener("click",closeModal);
+$("transactionForm").addEventListener("submit",addTransaction);
+
+$("txType").addEventListener("change",()=>{
+  populateCategories($("txType").value);
+});
+
+$("clearBtn").addEventListener("click",clearAll);
+$("exportBtn").addEventListener("click",exportCSV);
+
+$("monthFilter").addEventListener("change",renderAll);
+
+$("currency").addEventListener("change",()=>{
+  state.currency = $("currency").value;
+  save();
+  renderAll();
+});
+
+$("search").addEventListener("input",renderTransactions);
+$("typeFilter").addEventListener("change",renderTransactions);
+
+$("modalBackdrop").addEventListener("click",event=>{
+  if(event.target === $("modalBackdrop")) closeModal();
+});
+
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape") closeModal();
+});
+
+window.addEventListener("resize",drawChart);
+
+// مهم: لا تتم إضافة أي بيانات تجريبية تلقائيًا.
+load();
+$("txDate").value = today();
+renderAll();
+
+})();
+</script>
+</body>
+</html>
